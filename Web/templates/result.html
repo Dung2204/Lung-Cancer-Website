@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Kết quả chẩn đoán - Lung Health AI{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <h2>Kết quả chẩn đoán của bạn</h2>
+
+    {% if detailed_results.prediction == 1 %}
+        <div class="alert flash-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Nguy cơ ung thư phổi: CAO</h3>
+            <p><strong>Cảnh báo:</strong> Hệ thống AI của chúng tôi cho thấy bạn có nguy cơ cao mắc bệnh ung thư phổi dựa trên các thông tin đã cung cấp.</p>
+        </div>
+    {% else %}
+        <div class="alert flash-success">
+            <i class="fas fa-check-circle"></i>
+            <h3>Nguy cơ ung thư phổi: THẤP</h3>
+            <p>Chúc mừng! Dựa trên các thông tin bạn đã cung cấp, hệ thống AI của chúng tôi cho thấy bạn có nguy cơ thấp mắc bệnh ung thư phổi.</p>
+        </div>
+    {% endif %}
+
+    <div class="result-details-section">
+        <h3>Giải thích chi tiết:</h3>
+        <p>{{ detailed_results.explanations.overall }}</p>
+
+        {% if detailed_results.explanations.smoking %}
+            <p><strong>Về việc hút thuốc:</strong> {{ detailed_results.explanations.smoking }}</p>
+        {% endif %}
+        {% if detailed_results.explanations.age %}
+            <p><strong>Về độ tuổi:</strong> {{ detailed_results.explanations.age }}</p>
+        {% endif %}
+        {% if detailed_results.explanations.chronic_disease %}
+            <p><strong>Về bệnh mãn tính:</strong> {{ detailed_results.explanations.chronic_disease }}</p>
+        {% endif %}
+        {% if detailed_results.explanations.symptoms %}
+            <p><strong>Về các triệu chứng:</strong> {{ detailed_results.explanations.symptoms }}</p>
+        {% endif %}
+        {# Bạn có thể thêm nhiều giải thích dựa trên các yếu tố khác tại đây #}
+    </div>
+
+    <div class="result-inputs-section">
+        <h3>Thông tin đầu vào của bạn:</h3>
+        <table class="input-details-table">
+            <tbody>
+                {% for key, value in detailed_results.inputs.items() %}
+                <tr>
+                    <td><strong>{{ key }}:</strong></td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="result-actions">
+        <p class="warning-note">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Lưu ý quan trọng:</strong> Kết quả này chỉ mang tính tham khảo và không thay thế cho chẩn đoán y tế chuyên nghiệp. Hãy luôn tham khảo ý kiến của bác sĩ hoặc chuyên gia y tế để được tư vấn và chẩn đoán chính xác nhất về tình trạng sức khỏe của bạn.
+        </p>
+        <a href="{{ url_for('diagnose') }}" class="button primary-button"><i class="fas fa-redo"></i> Chẩn đoán lại</a>
+        <a href="{{ url_for('history') }}" class="button secondary-button"><i class="fas fa-history"></i> Xem lịch sử chẩn đoán</a>
+    </div>
+</div>
+{% endblock %}

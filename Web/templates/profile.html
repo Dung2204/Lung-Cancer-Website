@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}<title>Cài đặt Hồ sơ - Lung Health AI</title>{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <h2><i class="fas fa-user-cog"></i> Cài đặt Hồ sơ</h2>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="email"><i class="fas fa-envelope"></i> Thay đổi Email</button>
+        <button class="tab-button" data-tab="password"><i class="fas fa-key"></i> Thay đổi Mật khẩu</button>
+        <button class="tab-button" data-tab="avatar"><i class="fas fa-image"></i> Cập nhật Avatar</button>
+    </div>
+
+    <div id="email-tab-content" class="tab-content active">
+        <h3><i class="fas fa-envelope"></i> Thay đổi Email</h3>
+        <form method="POST" action="{{ url_for('change_email') }}" class="profile-form">
+            <div class="form-group">
+                <label for="current_email">Email hiện tại:</label>
+                <input type="email" id="current_email" value="{{ current_user.email }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="new_email">Email mới:</label>
+                <input type="email" id="new_email" name="new_email" required>
+            </div>
+            <button type="submit" class="button"><i class="fas fa-save"></i> Cập nhật Email</button>
+        </form>
+    </div>
+
+    <div id="password-tab-content" class="tab-content">
+        <h3><i class="fas fa-key"></i> Thay đổi Mật khẩu</h3>
+        <form method="POST" action="{{ url_for('change_password') }}" class="profile-form">
+            <div class="form-group">
+                <label for="current_password">Mật khẩu hiện tại:</label>
+                <input type="password" id="current_password" name="current_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Mật khẩu mới:</label>
+                <input type="password" id="new_password" name="new_password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_new_password">Xác nhận mật khẩu mới:</label>
+                <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+            </div>
+            <button type="submit" class="button"><i class="fas fa-save"></i> Cập nhật Mật khẩu</button>
+        </form>
+    </div>
+
+    <div id="avatar-tab-content" class="tab-content">
+        <h3><i class="fas fa-image"></i> Cập nhật Avatar</h3>
+        <form method="POST" action="{{ url_for('change_avatar') }}" enctype="multipart/form-data" class="profile-form">
+            <div class="form-group avatar-upload-section">
+                <label>Ảnh đại diện hiện tại:</label>
+                <div class="avatar-preview-container">
+                    <img id="current-avatar-img" src="{{ url_for('static', filename='uploads/avatars/' + current_user.profile_image) }}" alt="Ảnh đại diện" class="current-avatar-img">
+                </div>
+                <label for="avatar_upload" class="file-upload-button">
+                    <i class="fas fa-upload"></i> Chọn ảnh mới
+                </label>
+                <input type="file" id="avatar_upload" name="avatar" accept="image/*" onchange="previewAvatar(event)">
+                <p class="help-text">Kích thước tối đa: 2MB. Định dạng: PNG, JPG, JPEG, GIF.</p>
+            </div>
+            <button type="submit" class="button"><i class="fas fa-upload"></i> Tải lên Avatar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash.substring(1); // Lấy hash từ URL, bỏ qua '#'
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Hàm để hiển thị tab dựa trên hash
+        function showTabFromHash(tabId) {
+            tabButtons.forEach(button => {
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            tabContents.forEach(content => {
+                if (content.id === tabId + '-tab-content') {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // Kiểm tra nếu có hash khi tải trang
+        if (hash) {
+            showTabFromHash(hash);
+        } else {
+            // Mặc định hiển thị tab email nếu không có hash
+            showTabFromHash('email');
+        }
+
+        // Xử lý sự kiện click cho các nút tab
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Xóa lớp 'active' khỏi tất cả các nút và nội dung
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Thêm lớp 'active' cho nút được nhấp
+                button.classList.add('active');
+
+                // Hiển thị nội dung tab tương ứng
+                const tabId = button.dataset.tab;
+                document.getElementById(tabId + '-tab-content').classList.add('active');
+
+                // Cập nhật URL hash để duy trì tab khi refresh
+                window.location.hash = tabId;
+            });
+        });
+
+        // Optional: Preview avatar image before upload
+        window.previewAvatar = function(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('current-avatar-img');
+                output.src = reader.result;
+            };
+            if (event.target.files && event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        };
+    });
+</script>
+{% endblock %}

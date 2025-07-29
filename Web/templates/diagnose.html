@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Chẩn đoán nguy cơ ung thư phổi</h2>
+<form method="POST" id="diagnose-form" class="diagnosis-form-grid">
+    <div class="form-group">
+        <label for="age">Tuổi:</label>
+        <input type="number" id="age" name="age" class="form-control" required min="1" max="120" value="{{ age if age is not none }}">
+    </div>
+
+    <div class="form-group">
+        <label for="gender">Giới tính:</label>
+        <select id="gender" name="gender" class="form-control" required>
+            <option value="" {% if gender is none or gender == '' %}selected{% endif %}>-- Chọn giới tính --</option>
+            <option value="1" {% if gender == 1 %}selected{% endif %}>Nam</option>
+            <option value="0" {% if gender == 0 %}selected{% endif %}>Nữ</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="smoking">Hút thuốc:</label>
+        <select id="smoking" name="smoking" class="form-control" required>
+            <option value="" {% if smoking is none or smoking == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if smoking == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if smoking == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="anxiety">Lo âu:</label>
+        <select id="anxiety" name="anxiety" class="form-control" required>
+            <option value="" {% if anxiety is none or anxiety == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if anxiety == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if anxiety == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="peer_pressure">Áp lực bạn bè:</label>
+        <select id="peer_pressure" name="peer_pressure" class="form-control" required>
+            <option value="" {% if peer_pressure is none or peer_pressure == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if peer_pressure == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if peer_pressure == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="chronic_disease">Bệnh mãn tính:</label>
+        <select id="chronic_disease" name="chronic_disease" class="form-control" required>
+            <option value="" {% if chronic_disease is none or chronic_disease == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if chronic_disease == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if chronic_disease == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="fatigue">Mệt mỏi:</label>
+        <select id="fatigue" name="fatigue" class="form-control" required>
+            <option value="" {% if fatigue is none or fatigue == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if fatigue == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if fatigue == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="allergy">Dị ứng:</label>
+        <select id="allergy" name="allergy" class="form-control" required>
+            <option value="" {% if allergy is none or allergy == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if allergy == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if allergy == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="wheezing">Khò khè:</label>
+        <select id="wheezing" name="wheezing" class="form-control" required>
+            <option value="" {% if wheezing is none or wheezing == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if wheezing == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if wheezing == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="coughing">Ho:</label>
+        <select id="coughing" name="coughing" class="form-control" required>
+            <option value="" {% if coughing is none or coughing == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if coughing == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if coughing == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="shortness_of_breath">Khó thở:</label>
+        <select id="shortness_of_breath" name="shortness_of_breath" class="form-control" required>
+            <option value="" {% if shortness_of_breath is none or shortness_of_breath == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if shortness_of_breath == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if shortness_of_breath == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="yellow_fingers">Ngón tay bị vàng:</label>
+        <select id="yellow_fingers" name="yellow_fingers" class="form-control" required>
+            <option value="" {% if yellow_fingers is none or yellow_fingers == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if yellow_fingers == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if yellow_fingers == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="swallowing_difficulty">Khó nuốt:</label>
+        <select id="swallowing_difficulty" name="swallowing_difficulty" class="form-control" required>
+            <option value="" {% if swallowing_difficulty is none or swallowing_difficulty == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if swallowing_difficulty == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if swallowing_difficulty == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="alcohol_consuming">Tiêu thụ rượu:</label> {# Đã sửa name từ 'alcohol' thành 'alcohol_consuming' #}
+        <select id="alcohol_consuming" name="alcohol_consuming" class="form-control" required>
+            <option value="" {% if alcohol_consuming is none or alcohol_consuming == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if alcohol_consuming == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if alcohol_consuming == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="chest_pain">Đau ngực:</label>
+        <select id="chest_pain" name="chest_pain" class="form-control" required>
+            <option value="" {% if chest_pain is none or chest_pain == '' %}selected{% endif %}>-- Chọn --</option>
+            <option value="1" {% if chest_pain == 1 %}selected{% endif %}>Có</option>
+            <option value="0" {% if chest_pain == 0 %}selected{% endif %}>Không</option>
+        </select>
+    </div>
+    
+    <div style="grid-column: 1 / -1; text-align: center;"> {# Nút bấm nằm giữa các cột #}
+        <button type="submit" class="btn btn-primary"><i class="fas fa-stethoscope"></i> Chẩn đoán</button>
+    </div>
+</form>
+{% endblock %}

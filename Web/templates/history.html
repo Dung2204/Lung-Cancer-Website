@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Lịch sử chẩn đoán - Lung Health AI{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <h2>Lịch sử chẩn đoán của bạn</h2>
+
+    {% if diagnoses %}
+        <div class="diagnosis-list">
+            {% for diag in diagnoses %}
+            <div class="diagnosis-card {% if diag.result == 'Nguy cơ cao' %}card-danger{% else %}card-success{% endif %}">
+                <div class="card-header">
+                    <h3>Kết quả: {{ diag.result }} ({{ diag.probability }})</h3>
+                    <p class="timestamp">Thời gian: {{ diag.timestamp }}</p>
+                </div>
+                <div class="card-body">
+                    <h4>Thông tin đầu vào:</h4>
+                    <table class="input-details-table">
+                        <tbody>
+                            <tr><td><strong>Giới tính:</strong></td><td>{{ diag.gender }}</td></tr>
+                            <tr><td><strong>Tuổi:</strong></td><td>{{ diag.age }}</td></tr>
+                            <tr><td><strong>Hút thuốc:</strong></td><td>{{ diag.smoking }}</td></tr>
+                            <tr><td><strong>Ngón tay bị vàng:</strong></td><td>{{ diag.yellow_fingers }}</td></tr>
+                            <tr><td><strong>Lo âu:</strong></td><td>{{ diag.anxiety }}</td></tr>
+                            <tr><td><strong>Áp lực bạn bè:</strong></td><td>{{ diag.peer_pressure }}</td></tr>
+                            <tr><td><strong>Bệnh mãn tính:</strong></td><td>{{ diag.chronic_disease }}</td></tr>
+                            <tr><td><strong>Mệt mỏi:</strong></td><td>{{ diag.fatigue }}</td></tr>
+                            <tr><td><strong>Dị ứng:</strong></td><td>{{ diag.allergy }}</td></tr>
+                            <tr><td><strong>Khò khè:</strong></td><td>{{ diag.wheezing }}</td></tr>
+                            <tr><td><strong>Tiêu thụ rượu:</strong></td><td>{{ diag.alcohol_consuming }}</td></tr>
+                            <tr><td><strong>Ho:</strong></td><td>{{ diag.coughing }}</td></tr>
+                            <tr><td><strong>Khó thở:</strong></td><td>{{ diag.shortness_of_breath }}</td></tr>
+                            <tr><td><strong>Khó nuốt:</strong></td><td>{{ diag.swallowing_difficulty }}</td></tr>
+                            <tr><td><strong>Đau ngực:</strong></td><td>{{ diag.chest_pain }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-history-message">Bạn chưa có lịch sử chẩn đoán nào.</p>
+        <a href="{{ url_for('diagnose') }}" class="button primary-button"><i class="fas fa-stethoscope"></i> Chẩn đoán ngay</a>
+    {% endif %}
+
+    <div class="result-actions">
+        <a href="{{ url_for('diagnose') }}" class="button secondary-button"><i class="fas fa-redo"></i> Chẩn đoán lại</a>
+    </div>
+</div>
+{% endblock %}

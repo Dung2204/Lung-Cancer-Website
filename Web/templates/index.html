@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Chẩn đoán nguy cơ ung thư phổi với AI</h1>
+            <p>Đánh giá nhanh chóng các yếu tố nguy cơ của bạn và nhận kết quả tức thì để chủ động bảo vệ sức khỏe hô hấp.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('diagnose') }}" class="button primary-button">Bắt đầu chẩn đoán ngay</a>
+                <a href="#how-it-works" class="button secondary-button">Tìm hiểu thêm</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="{{ url_for('static', filename='images/image.png') }}" alt="Lung Health illustration">
+        </div>
+    </div>
+</section>
+
+<section id="how-it-works" class="how-it-works-section">
+    <div class="container">
+        <h2>Cách thức hoạt động của chúng tôi</h2>
+        <div class="steps-grid">
+            <div class="step-item">
+                <i class="fas fa-user-edit icon-large"></i> {# Font Awesome icon #}
+                <h3>1. Nhập thông tin</h3>
+                <p>Cung cấp các thông tin sức khỏe cơ bản và các triệu chứng liên quan.</p>
+            </div>
+            <div class="step-item">
+                <i class="fas fa-brain icon-large"></i> {# Font Awesome icon #}
+                <h3>2. AI phân tích</h3>
+                <p>Hệ thống AI của chúng tôi sẽ phân tích dữ liệu của bạn dựa trên mô hình tiên tiến.</p>
+            </div>
+            <div class="step-item">
+                <i class="fas fa-chart-bar icon-large"></i> {# Font Awesome icon #}
+                <h3>3. Nhận kết quả</h3>
+                <p>Xem kết quả đánh giá nguy cơ tức thì và lời khuyên ban đầu.</p>
+            </div>
+            <div class="step-item">
+                <i class="fas fa-user-md icon-large"></i> {# Font Awesome icon #}
+                <h3>4. Tham vấn chuyên gia</h3>
+                <p>Kết quả chỉ mang tính tham khảo, hãy luôn tham khảo ý kiến bác sĩ để có chẩn đoán chính xác.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2>Tại sao chọn Lung Health AI?</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-tachometer-alt icon-small"></i>
+                <h3>Nhanh chóng & Dễ dàng</h3>
+                <p>Chỉ mất vài phút để hoàn thành việc đánh giá.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt icon-small"></i>
+                <h3>Bảo mật thông tin</h3>
+                <p>Dữ liệu cá nhân của bạn được bảo vệ an toàn.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-lightbulb icon-small"></i>
+                <h3>Công nghệ AI tiên tiến</h3>
+                <p>Sử dụng mô hình học máy để đưa ra dự đoán.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-bottom-section">
+    <div class="container">
+        <h2>Bạn đã sẵn sàng để kiểm tra sức khỏe phổi của mình?</h2>
+        <a href="{{ url_for('diagnose') }}" class="button primary-button large-button">Bắt đầu chẩn đoán ngay!</a>
+    </div>
+</section>
+
+{% endblock %}

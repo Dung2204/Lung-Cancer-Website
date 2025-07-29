@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="admin-dashboard">
+    <h2><i class="fas fa-users"></i> Quản lý người dùng</h2>
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên tài khoản</th>
+                <th>Admin</th>
+                <th>Trạng thái cấm</th>
+                <th>Cấm đến</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{% if user.is_admin %}<i class="fas fa-check-circle text-success"></i> Có{% else %}<i class="fas fa-times-circle text-danger"></i> Không{% endif %}</td>
+                <td>
+                    {% if user.is_banned %}
+                        <span class="text-danger"><i class="fas fa-ban"></i> Bị cấm</span>
+                    {% else %}
+                        <span class="text-success"><i class="fas fa-check-circle"></i> Hoạt động</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.ban_until.strftime('%Y-%m-%d %H:%M:%S') if user.ban_until else 'Vĩnh viễn' if user.is_banned else 'N/A' }}</td>
+                <td>
+                    {% if user.id == current_user.id or user.is_admin %}
+                        {# Admin không thể tự xóa hoặc xóa/cấm admin khác #}
+                        <button type="button" class="button button-secondary" disabled>Hành động</button>
+                    {% else %}
+                        <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline-block; margin-right: 5px;">
+                            <button type="submit" class="button button-danger" onclick="return confirm('Bạn có chắc muốn xóa người dùng {{ user.username }} và tất cả dữ liệu liên quan không?');">Xóa</button>
+                        </form>
+                        
+                        {% if user.is_banned %}
+                            <form action="{{ url_for('unban_user', user_id=user.id) }}" method="POST" style="display:inline-block;">
+                                <button type="submit" class="button button-success" onclick="return confirm('Bạn có muốn bỏ cấm người dùng {{ user.username }} không?');">Bỏ cấm</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('ban_user', user_id=user.id) }}" method="POST" style="display:inline-block; margin-right: 5px;">
+                                <input type="hidden" name="ban_duration" value="7"> {# Thêm trường ẩn để truyền duration_days #}
+                                <button type="submit" class="button button-warning" onclick="return confirm('Bạn có chắc muốn cấm người dùng {{ user.username }} trong 7 ngày không?');">Cấm 7 ngày</button>
+                            </form>
+                            <form action="{{ url_for('ban_user', user_id=user.id) }}" method="POST" style="display:inline-block;">
+                                <input type="hidden" name="ban_duration" value="0"> {# Thêm trường ẩn để truyền duration_days #}
+                                <button type="submit" class="button button-danger" onclick="return confirm('Bạn có chắc muốn cấm người dùng {{ user.username }} vĩnh viễn không?');">Cấm vĩnh viễn</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2><i class="fas fa-history"></i> Lịch sử chẩn đoán của người dùng</h2>
+    
+    <div class="search-form-container">
+        <form action="{{ url_for('admin_panel') }}" method="GET" class="search-form">
+            <input type="text" name="search_username" placeholder="Tìm kiếm theo tên người dùng..." 
+                   value="{{ search_username if search_username }}" class="search-input">
+            <button type="submit" class="button primary-button"><i class="fas fa-search"></i> Tìm kiếm</button>
+            {% if search_username %}
+                <a href="{{ url_for('admin_panel') }}" class="button secondary-button clear-search-button"><i class="fas fa-times"></i> Xóa tìm kiếm</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if all_diagnoses %}
+        <div class="table-responsive">
+            <table class="table admin-table diagnosis-table">
+                <thead>
+                    <tr>
+                        <th>Người dùng</th>
+                        <th>Thời gian</th>
+                        <th>Tuổi</th>
+                        <th>Giới tính</th>
+                        <th>Hút thuốc</th>
+                        <th>Ngón tay vàng</th>
+                        <th>Lo âu</th>
+                        <th>Áp lực bạn bè</th>
+                        <th>Bệnh mãn tính</th>
+                        <th>Mệt mỏi</th>
+                        <th>Dị ứng</th>
+                        <th>Khò khè</th>
+                        <th>Tiêu thụ rượu</th>
+                        <th>Ho</th>
+                        <th>Khó thở</th>
+                        <th>Khó nuốt</th>
+                        <th>Đau ngực</th>
+                        <th>Kết quả</th>
+                        <th>Xác suất</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for diag in all_diagnoses %}
+                    <tr>
+                        <td>{{ diag.username }}</td>
+                        <td>{{ diag.timestamp }}</td>
+                        <td>{{ diag.age }}</td>
+                        <td>{{ diag.gender }}</td>
+                        <td>{{ diag.smoking }}</td>
+                        <td>{{ diag.yellow_fingers }}</td>
+                        <td>{{ diag.anxiety }}</td>
+                        <td>{{ diag.peer_pressure }}</td>
+                        <td>{{ diag.chronic_disease }}</td>
+                        <td>{{ diag.fatigue }}</td>
+                        <td>{{ diag.allergy }}</td>
+                        <td>{{ diag.wheezing }}</td>
+                        <td>{{ diag.alcohol_consuming }}</td>
+                        <td>{{ diag.coughing }}</td>
+                        <td>{{ diag.shortness_of_breath }}</td>
+                        <td>{{ diag.swallowing_difficulty }}</td>
+                        <td>{{ diag.chest_pain }}</td>
+                        <td class="{% if diag.result == 'Nguy cơ cao' %}text-danger{% else %}text-success{% endif %}">{{ diag.result }}</td>
+                        <td>{{ diag.probability }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Không tìm thấy lịch sử chẩn đoán nào hoặc chưa có lịch sử trong hệ thống.</p>
+    {% endif %}
+</div>
+
+<style>
+    /* CSS specific to admin.html for text colors */
+    .text-success { color: #28a745; }
+    .text-danger { color: #dc3545; }
+    .text-warning { color: #ffc107; }
+
+    /* Thêm style cho bảng chẩn đoán để cuộn ngang nếu quá rộng */
+    .table-responsive {
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .admin-table th, .admin-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+        white-space: nowrap; /* Ngăn không cho nội dung bị xuống dòng */
+    }
+
+    .admin-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .admin-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .admin-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .search-form-container {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px; /* Khoảng cách giữa các phần tử trong form */
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search-input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        flex-grow: 1; /* Cho phép input mở rộng */
+        min-width: 200px; /* Đảm bảo input không quá nhỏ */
+    }
+
+    .button {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .primary-button {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+    .primary-button:hover {
+        background-color: #0056b3;
+    }
+
+    .secondary-button {
+        background-color: #6c757d;
+        color: white;
+        border: 1px solid #6c757d;
+    }
+    .secondary-button:hover {
+        background-color: #5a6268;
+    }
+
+    .clear-search-button {
+        background-color: #f8f9fa;
+        color: #343a40;
+        border: 1px solid #ccc;
+    }
+    .clear-search-button:hover {
+        background-color: #e2e6ea;
+    }
+
+</style>
+{% endblock %}

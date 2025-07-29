@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Đăng ký tài khoản</h2>
+<form method="POST" id="register-form">
+    <label for="username">Tên tài khoản:</label>
+    <input type="text" id="username" name="username" required minlength="3">
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required> {# Thêm trường này #}
+
+    <label for="password">Mật khẩu:</label>
+    <input type="password" id="password" name="password" required minlength="6">
+
+    <label for="confirm_password">Xác nhận mật khẩu:</label>
+    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+
+    <button type="submit"><i class="fas fa-user-plus"></i> Đăng ký</button>
+</form>
+{% endblock %}

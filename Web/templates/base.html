@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+    <style>
+        /* CSS cho Widget Chatbot nổi */
+        .chatbot-widget-container {
+            position: fixed; /* Giữ chatbot ở vị trí cố định trên viewport */
+            bottom: 20px; /* Cách đáy 20px */
+            right: 20px; /* Cách phải 20px */
+            z-index: 1000; /* Đảm bảo nó nằm trên cùng các yếu tố khác */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .chatbot-toggle-button {
+            background-color: #00796b; /* Màu xanh teal */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Nút tròn */
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .chatbot-toggle-button:hover {
+            background-color: #004d40;
+            transform: scale(1.05);
+        }
+
+        .chatbot-window {
+            display: none; /* Mặc định ẩn */
+            position: absolute;
+            bottom: 80px; /* Vị trí phía trên nút toggle */
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-window.show {
+            display: flex; /* Hiển thị khi có class 'show' */
+        }
+
+        .chat-header {
+            background-color: #00796b;
+            color: white;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message {
+            align-self: flex-end; /* Căn tin nhắn người dùng sang phải */
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-message {
+            align-self: flex-start; /* Căn tin nhắn bot sang trái */
+            background-color: #e0e0e0;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .chat-input-area button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input-area button:hover {
+            background-color: #004d40;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <h1 class="site-title"><a href="{{ url_for('index') }}">Lung Health AI</a></h1>
+            <nav class="main-nav">
+                <a href="{{ url_for('index') }}" class="nav-link"><i class="fas fa-home"></i> Trang chủ</a>
+                <a href="{{ url_for('diagnose') }}" class="nav-link"><i class="fas fa-lungs"></i> Chẩn đoán</a>
+                {# Đã xóa liên kết riêng đến trang chatbot ở đây vì nó giờ là widget nổi #}
+                
+                {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            Chào mừng, {{ current_user.username }} <i class="fas fa-caret-down"></i>
+                            <img src="{{ url_for('static', filename='uploads/avatars/' + current_user.profile_image) }}" alt="Avatar" class="navbar-avatar">
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a href="{{ url_for('profile') }}" class="dropdown-item"><i class="fas fa-user-circle"></i> Hồ sơ cá nhân</a>
+                            <a href="{{ url_for('history') }}" class="dropdown-item"><i class="fas fa-history"></i> Lịch sử chẩn đoán</a>
+                            {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin_panel') }}" class="dropdown-item"><i class="fas fa-tools"></i> Quản trị</a>
+                            {% endif %}
+                            <a href="{{ url_for('logout') }}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="nav-link"><i class="fas fa-user-plus"></i> Đăng ký</a>
+                    <a href="{{ url_for('login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {# Flash messages section (giữ nguyên) #}
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="page-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; {{ current_year }} Lung Health. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {# Thêm JavaScript cho dropdown và Chatbot vào cuối body, trước thẻ </body> #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Logic cho Dropdown menu người dùng (GIỮ NGUYÊN)
+            const userDropdown = document.getElementById('userDropdown');
+            const dropdownMenu = userDropdown ? userDropdown.nextElementSibling : null;
+
+            if (userDropdown) {
+                userDropdown.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    dropdownMenu.classList.toggle('show');
+                    this.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+                });
+            }
+
+            document.addEventListener('click', function(event) {
+                if (userDropdown && !userDropdown.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                    userDropdown.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // --- JavaScript cho Widget Chatbot (MỚI / ĐIỀU CHỈNH) ---
+            const chatbotToggleButton = document.getElementById('chatbotToggleButton');
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const sendChatBtn = document.getElementById('sendChatBtn');
+            const closeChatBtn = document.getElementById('closeChatBtn');
+
+            function appendChatMessage(sender, message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender + '-message');
+                messageDiv.innerHTML = `<p>${message}</p>`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight; // Cuộn xuống cuối
+            }
+
+            // Gửi tin nhắn đến API chatbot
+            async function sendChatMessage() {
+                const message = chatInput.value.trim();
+                if (message === '') return;
+
+                appendChatMessage('user', message);
+                chatInput.value = ''; // Xóa nội dung input
+
+                try {
+                    const response = await fetch('{{ url_for("chatbot_api") }}', { // Sử dụng url_for để tạo URL API
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+
+                    const data = await response.json();
+                    appendChatMessage('bot', data.response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi tin nhắn đến chatbot:', error);
+                    appendChatMessage('bot', 'Xin lỗi, tôi đang gặp sự cố. Vui lòng thử lại sau.');
+                }
+            }
+
+            // Xử lý bật/tắt cửa sổ chatbot
+            chatbotToggleButton.addEventListener('click', function() {
+                const isShowing = chatbotWindow.classList.toggle('show');
+                if (isShowing) {
+                    // Thêm tin nhắn chào mừng chỉ khi mở lần đầu hoặc khi không có tin nhắn nào
+                    if (chatMessages.children.length === 0) {
+                         appendChatMessage('bot', 'Xin chào! Tôi là chatbot của Lung Health AI. Tôi có thể giúp bạn giải đáp các câu hỏi thường gặp về ứng dụng và thông tin chung về sức khỏe phổi.');
+                         appendChatMessage('bot', 'Bạn có thể hỏi về: "chẩn đoán", "triệu chứng", "đăng ký", "lịch sử", "tài khoản", "liên hệ", v.v.');
+                    }
+                    chatInput.focus(); // Tập trung vào ô nhập liệu
+                }
+            });
+
+            // Xử lý đóng cửa sổ chatbot
+            closeChatBtn.addEventListener('click', function() {
+                chatbotWindow.classList.remove('show');
+            });
+
+            // Gửi tin nhắn bằng nút hoặc Enter
+            sendChatBtn.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        });
+    </script>
+
+    {# Cấu trúc HTML cho Widget Chatbot nổi (MỚI) #}
+    <div class="chatbot-widget-container">
+        <button id="chatbotToggleButton" class="chatbot-toggle-button">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div id="chatbotWindow" class="chatbot-window">
+            <div class="chat-header">
+                Chatbot Hỗ Trợ
+                <button class="close-btn" id="closeChatBtn">&times;</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Gõ tin nhắn của bạn...">
+                <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
