@@ -40,13 +40,19 @@ db.init_app(app)
 
 # Load mô hình chẩn đoán
 try:
-    # Bỏ 'models' khỏi đường dẫn vì file nằm cùng cấp với app.py
-    model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'model', 'lung_cancer_model.pkl')
+    # Cập nhật đường dẫn để chỉ đúng vào thư mục 'model'
+    model_path = os.path.join(os.path.dirname(__file__), 'model', 'lung_cancer_model.pkl')
     model = joblib.load(model_path)
     print("DEBUG: Mô hình 'lung_cancer_model.pkl' đã được tải thành công.")
+
+    # Tải scaler cũng cần đường dẫn tương tự
+    scaler_path = os.path.join(os.path.dirname(__file__), 'model', 'scaler.pkl')
+    scaler = joblib.load(scaler_path)
+    print("DEBUG: Scaler 'scaler.pkl' đã được tải thành công.")
 except Exception as e:
-    print(f"Lỗi khi tải mô hình: {e}")
-    model = None # Gán None nếu tải thất bại
+    print(f"Lỗi khi tải mô hình hoặc scaler: {e}")
+    model = None
+    scaler = None
 
 # User loader cho Flask-Login
 @login_manager.user_loader
@@ -558,6 +564,7 @@ if __name__ == '__main__':
 
 
     app.run(debug=True)
+
 
 
 
