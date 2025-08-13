@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
-from extensions import db
+from .extensions import db
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,4 +40,5 @@ class DiagnosisResult(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
+
         return f'<DiagnosisResult {self.id} for User {self.user_id} - Pred: {self.prediction}>'
