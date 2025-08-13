@@ -40,10 +40,8 @@ db.init_app(app)
 
 # Load mô hình chẩn đoán
 try:
-    # os.path.dirname(__file__) lấy đường dẫn thư mục hiện tại của app.py
-    # 'models' là tên thư mục con chứa mô hình
-    # 'lung_cancer_model.pkl' là tên file mô hình
-    model_path = os.path.join(os.path.dirname(__file__), 'models', 'lung_cancer_model.pkl')
+    # Bỏ 'models' khỏi đường dẫn vì file nằm cùng cấp với app.py
+    model_path = os.path.join(os.path.dirname(__file__), 'lung_cancer_model.pkl')
     model = joblib.load(model_path)
     print("DEBUG: Mô hình 'lung_cancer_model.pkl' đã được tải thành công.")
 except Exception as e:
@@ -560,6 +558,7 @@ if __name__ == '__main__':
 
 
     app.run(debug=True)
+
 
 
 
