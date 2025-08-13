@@ -40,7 +40,7 @@ db.init_app(app)
 
 # Load mô hình chẩn đoán
 try:
-    model_path = r'C:\Users\Dell\OneDrive\Pictures\Documents\Code\python\OpenCV\Project\Ungthu\Web\model\lung_cancer_model.pkl'
+    model_path = os.path.join(app.root_path, 'model', 'lung_cancer_model.pkl')
     model = joblib.load(model_path)
     print("DEBUG: Mô hình 'lung_cancer_model.pkl' đã được tải thành công.")
 except Exception as e:
@@ -554,5 +554,6 @@ if __name__ == '__main__':
             print(f"Người dùng admin '{admin_username}' được tạo thành công.")
         else:
             print(f"Người dùng admin '{admin_username}' đã tồn tại.")
+
 
     app.run(debug=True)
