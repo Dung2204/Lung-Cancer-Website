@@ -9,7 +9,7 @@ import joblib
 import os
 import re # Đã thêm thư viện re cho xử lý chuỗi
 
-from extensions import db
+from database import db
 from models import User, DiagnosisResult
 
 # Khởi tạo Flask App
@@ -557,3 +557,4 @@ if __name__ == '__main__':
 
 
     app.run(debug=True)
+
